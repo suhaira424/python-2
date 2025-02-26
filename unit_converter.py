@@ -1,13 +1,22 @@
 import streamlit as st
 
-
 def convert_units(value, from_unit, to_unit):
-    ureg = UnitRegistry()
-    try:
-        result = (value * ureg(from_unit)).to(to_unit)
-        return result.magnitude
-    except Exception as e:
-        return f"Error: {str(e)}"
+    conversions = {
+        ('meters', 'feet'): 3.28084,
+        ('feet', 'meters'): 0.3048,
+        ('kilograms', 'pounds'): 2.20462,
+        ('pounds', 'kilograms'): 0.453592,
+        ('celsius', 'fahrenheit'): lambda c: (c * 9/5) + 32,
+        ('fahrenheit', 'celsius'): lambda f: (f - 32) * 5/9
+    }
+    
+    key = (from_unit, to_unit)
+    
+    if key in conversions:
+        factor = conversions[key]
+        return factor(value) if callable(factor) else value * factor
+    else:
+        return "Conversion not supported"
 
 def main():
     st.title("Google-Style Unit Converter")
